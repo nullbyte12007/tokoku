@@ -30,10 +30,13 @@ class TokokuTestCase(unittest.TestCase):
         self.ctx.push()
         db.init_db()
         sec._LOGIN_FAILURES.clear()
+        self._orig_captcha_min = sec.CAPTCHA_MIN_SECONDS
+        sec.CAPTCHA_MIN_SECONDS = 0  # pengujian tidak perlu menunggu jeda waktu
         self._seed()
         self.client = self.app.test_client()
 
     def tearDown(self):
+        sec.CAPTCHA_MIN_SECONDS = self._orig_captcha_min
         db.close_db()
         self.ctx.pop()
         self.tmpdir.cleanup()
@@ -106,16 +109,23 @@ class TokokuTestCase(unittest.TestCase):
 
     # ---------- auth ----------
 
-    def test_registrasi_lalu_login(self):
+    def register(self, payload):
+        """POST /register sekaligus menjawab captcha dari sesi."""
         self.client.get("/register")
-        resp = self.post(
-            "/register",
+        with self.client.session_transaction() as sess:
+            answer = (sess.get("_captcha") or {}).get("answer", "")
+        data = dict(payload)
+        data["captcha"] = answer
+        return self.post("/register", data)
+
+    def test_registrasi_lalu_login(self):
+        resp = self.register(
             {
                 "name": "Sari",
                 "email": "sari@test.id",
                 "password": "rahasia123",
                 "password2": "rahasia123",
-            },
+            }
         )
         self.assertEqual(resp.status_code, 302)
         self.assertIsNotNone(db.query("SELECT 1 FROM users WHERE email = ?", ("sari@test.id",), one=True))
@@ -124,25 +134,21 @@ class TokokuTestCase(unittest.TestCase):
         self.assertEqual(self.client.get("/account").status_code, 200)
 
     def test_registrasi_email_duplikat_ditolak(self):
-        self.client.get("/register")
-        self.post(
-            "/register",
+        self.register(
             {
                 "name": "Budi Lagi",
                 "email": "budi@test.id",
                 "password": "rahasia123",
                 "password2": "rahasia123",
-            },
+            }
         )
         self.assertEqual(
             db.scalar("SELECT COUNT(*) FROM users WHERE email = ?", ("budi@test.id",), default=0), 1
         )
 
     def test_password_pendek_ditolak(self):
-        self.client.get("/register")
-        self.post(
-            "/register",
-            {"name": "X", "email": "x@test.id", "password": "123", "password2": "123"},
+        self.register(
+            {"name": "Xx", "email": "x@test.id", "password": "123", "password2": "123"}
         )
         self.assertIsNone(db.query("SELECT 1 FROM users WHERE email = ?", ("x@test.id",), one=True))
 
