@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf %}
+
+{% block title %}Keranjang — Tokoku{% endblock %}
+
+{% block content %}
+<h1>Keranjang gua</h1>
+
+{% if problems %}
+  <div class="flash flash-error">
+    Ada item yang perlu dibereskan dulu: stok berubah atau produk sudah tidak dijual.
+  </div>
+{% endif %}
+
+{% if items %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Produk</th>
+          <th>Harga</th>
+          <th>Jumlah</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr class="{{ 'row-problem' if not item['is_active'] or item['qty'] > item['stock'] }}">
+            <td>
+              {% if item['is_active'] %}
+                <a href="{{ url_for('catalog.product_detail', product_id=item['product_id']) }}">{{ item['name'] }}</a>
+              {% else %}
+                {{ item['name'] }} <span class="stock out">tidak dijual</span>
+              {% endif %}
+              <div class="muted small">{{ item['category'] }}</div>
+            </td>
+            <td>{{ item['price']|rupiah }}</td>
+            <td>
+              <form method="post" action="{{ url_for('cart.update') }}" class="qty-form">
+                {{ csrf() }}
+                <input type="hidden" name="product_id" value="{{ item['product_id'] }}">
+                <input type="number" name="qty" value="{{ item['qty'] }}" min="0"
+                       max="{{ item['stock'] if item['stock'] < 99 else 99 }}">
+                <button type="submit" class="btn btn-sm btn-ghost">Update</button>
+              </form>
+              <div class="muted small">stok {{ item['stock'] }}</div>
+            </td>
+            <td><strong>{{ item['subtotal']|rupiah }}</strong></td>
+            <td>
+              <form method="post" action="{{ url_for('cart.remove') }}">
+                {{ csrf() }}
+                <input type="hidden" name="product_id" value="{{ item['product_id'] }}">
+                <button type="submit" class="linklike danger">Hapus</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cart-summary">
+    <div>
+      <span class="muted">Total ({{ cart_count }} pcs)</span>
+      <strong class="total">{{ total|rupiah }}</strong>
+    </div>
+    <div class="row-actions">
+      <form method="post" action="{{ url_for('cart.clear') }}">
+        {{ csrf() }}
+        <button type="submit" class="btn btn-ghost">Kosongkan</button>
+      </form>
+      <a class="btn" href="{{ url_for('orders.checkout') }}">Lanjut checkout</a>
+    </div>
+  </div>
+{% else %}
+  <div class="empty">
+    <p>Keranjang masih kosong.</p>
+    <a class="btn" href="{{ url_for('catalog.index') }}">Mulai belanja</a>
+  </div>
+{% endif %}
+{% endblock %}

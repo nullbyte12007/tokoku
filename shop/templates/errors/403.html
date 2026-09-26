@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Akses ditolak — Tokoku{% endblock %}
+
+{% block content %}
+<div class="empty">
+  <h1>403 — Akses ditolak</h1>
+  <p class="muted">Halaman ini cuma buat admin.</p>
+  <a class="btn" href="{{ url_for('catalog.index') }}">Balik ke katalog</a>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_macros.html" import admin_nav, csrf %}
+
+{% block title %}Admin — Produk{% endblock %}
+
+{% block content %}
+<header class="panel-head">
+  <h1>Produk</h1>
+  <a class="btn btn-sm" href="{{ url_for('admin.product_new') }}">+ Produk baru</a>
+</header>
+{{ admin_nav('products') }}
+
+<form class="inline-search" method="get" action="{{ url_for('admin.products') }}">
+  <input type="search" name="q" value="{{ q }}" placeholder="Cari nama / kategori...">
+  <button class="btn btn-sm btn-ghost" type="submit">Cari</button>
+  {% if q %}<a class="linklike" href="{{ url_for('admin.products') }}">Reset</a>{% endif %}
+</form>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Nama</th><th>Kategori</th><th>Harga</th><th>Stok</th>
+        <th>Aktif</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+        <tr class="{{ '' if p['is_active'] else 'row-muted' }}">
+          <td class="muted">{{ p['id'] }}</td>
+          <td>
+            <strong>{{ p['name'] }}</strong>
+            <div class="muted small">{{ p['slug'] }}</div>
+          </td>
+          <td>{{ p['category'] }}</td>
+          <td>{{ p['price']|rupiah }}</td>
+          <td>
+            <span class="stock {{ 'out' if p['stock'] == 0 }}">{{ p['stock'] }}</span>
+          </td>
+          <td>{{ 'ya' if p['is_active'] else 'tidak' }}</td>
+          <td class="row-actions">
+            <a href="{{ url_for('admin.product_edit', product_id=p['id']) }}">Edit</a>
+            {% if p['is_active'] %}
+              <form method="post" action="{{ url_for('admin.product_delete', product_id=p['id']) }}"
+                    data-confirm="Nonaktifkan produk ini?">
+                {{ csrf() }}
+                <button type="submit" class="linklike danger">Nonaktifkan</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="muted">Belum ada produk.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

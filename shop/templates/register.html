@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf %}
+
+{% block title %}Daftar — Tokoku{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1>Buat akun</h1>
+  <p class="muted">Sudah punya akun? <a href="{{ url_for('auth.login') }}">Masuk</a>.</p>
+
+  <form method="post" class="stack">
+    {{ csrf() }}
+    <label>
+      Nama
+      <input type="text" name="name" value="{{ values['name'] }}" required
+             minlength="2" maxlength="80" autocomplete="name" autofocus>
+    </label>
+    <label>
+      Email
+      <input type="email" name="email" value="{{ values['email'] }}" required autocomplete="email">
+    </label>
+    <label>
+      Password
+      <input type="password" name="password" required minlength="8"
+             autocomplete="new-password">
+      <span class="muted small">Minimal 8 karakter.</span>
+    </label>
+    <label>
+      Ulangi password
+      <input type="password" name="password2" required minlength="8"
+             autocomplete="new-password">
+    </label>
+    <label>
+      Berapa {{ captcha_question }}?
+      <input type="text" name="captcha" inputmode="numeric" required
+             autocomplete="off" placeholder="jawaban">
+      <span class="muted small">Buat memastikan kamu bukan robot.</span>
+    </label>
+    <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <button class="btn" type="submit">Daftar</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card, pager %}
+
+{% block title %}Tokoku — Belanja online{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Belanja tanpa ribet.</h1>
+  <p class="muted">Katalog produk pilihan, keranjang tersimpan, dan riwayat pesanan per akun.</p>
+</section>
+
+<div class="catalog-layout">
+  <aside class="sidebar">
+    <h2 class="sidebar-title">Kategori</h2>
+    <ul class="cat-list">
+      <li>
+        <a href="{{ url_for('catalog.index', q=q or None) }}"
+           class="{{ 'is-active' if not category }}">Semua produk</a>
+      </li>
+      {% for c in categories %}
+        <li>
+          <a href="{{ url_for('catalog.index', category=c['category'], q=q or None) }}"
+             class="{{ 'is-active' if category == c['category'] }}">
+            {{ c['category'] }} <span class="count">{{ c['jumlah'] }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <section class="catalog">
+    <header class="catalog-head">
+      <h2>
+        {% if q %}Hasil untuk "{{ q }}"{% elif category %}{{ category }}{% else %}Semua produk{% endif %}
+      </h2>
+      <span class="muted">{{ total }} produk</span>
+    </header>
+
+    {% if products %}
+      <div class="grid-products">
+        {% for p in products %}{{ product_card(p) }}{% endfor %}
+      </div>
+      {{ pager(page, pages) }}
+    {% else %}
+      <div class="empty">
+        <p>Belum ada produk yang cocok.</p>
+        {% if q or category %}
+          <a class="btn btn-sm" href="{{ url_for('catalog.index') }}">Reset filter</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

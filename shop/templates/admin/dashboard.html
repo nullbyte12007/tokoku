@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "_macros.html" import admin_nav, order_status %}
+
+{% block title %}Admin — Ringkasan{% endblock %}
+
+{% block content %}
+<h1>Panel admin</h1>
+{{ admin_nav('dashboard') }}
+
+<div class="stats">
+  <div class="stat">
+    <span class="stat-label">Produk aktif</span>
+    <strong>{{ stats['products'] }}</strong>
+    {% if stats['inactive'] %}<span class="muted small">{{ stats['inactive'] }} nonaktif</span>{% endif %}
+  </div>
+  <div class="stat">
+    <span class="stat-label">Pengguna</span>
+    <strong>{{ stats['users'] }}</strong>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Total pesanan</span>
+    <strong>{{ stats['orders'] }}</strong>
+    {% if stats['pending'] %}<span class="muted small">{{ stats['pending'] }} menunggu</span>{% endif %}
+  </div>
+  <div class="stat">
+    <span class="stat-label">Pendapatan</span>
+    <strong>{{ stats['revenue']|rupiah }}</strong>
+    <span class="muted small">status dibayar ke atas</span>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <section class="panel">
+    <header class="panel-head">
+      <h2>Pesanan terbaru</h2>
+      <a href="{{ url_for('admin.orders') }}">Kelola</a>
+    </header>
+    {% if recent_orders %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>#</th><th>Pembeli</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for o in recent_orders %}
+              <tr>
+                <td><a href="{{ url_for('admin.order_detail', order_id=o['id']) }}">#{{ o['id'] }}</a></td>
+                <td>{{ o['customer_name'] }}</td>
+                <td>{{ o['total']|rupiah }}</td>
+                <td>{{ order_status(o['status'], labels) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">Belum ada pesanan.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <header class="panel-head">
+      <h2>Stok menipis</h2>
+      <a href="{{ url_for('admin.products') }}">Produk</a>
+    </header>
+    {% if low_stock %}
+      <ul class="summary-list">
+        {% for p in low_stock %}
+          <li>
+            <a href="{{ url_for('admin.product_edit', product_id=p['id']) }}">{{ p['name'] }}</a>
+            <span class="stock {{ 'out' if p['stock'] == 0 }}">{{ p['stock'] }} pcs</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">Semua stok aman (&gt; 5 pcs).</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

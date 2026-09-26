@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Server error — Tokoku{% endblock %}
+
+{% block content %}
+<div class="empty">
+  <h1>500 — Ada error di server</h1>
+  <p class="muted">Coba lagi sebentar lagi. Kalau masih error, cek log terminal.</p>
+  <a class="btn" href="{{ url_for('catalog.index') }}">Balik ke katalog</a>
+</div>
+{% endblock %}

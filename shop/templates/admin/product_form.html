@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_macros.html" import admin_nav, csrf %}
+
+{% block title %}Admin — {{ 'Produk baru' if mode == 'new' else 'Edit produk' }}{% endblock %}
+
+{% block content %}
+<h1>{{ 'Produk baru' if mode == 'new' else 'Edit produk' }}</h1>
+{{ admin_nav('products') }}
+
+<form class="panel stack" method="post">
+  {{ csrf() }}
+
+  <label>
+    Nama produk
+    <input type="text" name="name" value="{{ product['name'] }}" required minlength="3" maxlength="120">
+  </label>
+
+  <div class="form-row">
+    <label>
+      Kategori
+      <input type="text" name="category" value="{{ product['category'] }}" maxlength="60"
+             placeholder="Contoh: Elektronik">
+    </label>
+    <label>
+      Harga (Rp)
+      <input type="text" name="price" value="{{ product['price'] }}" required
+             inputmode="numeric" placeholder="125000">
+      <span class="muted small">Angka saja; titik/koma diabaikan.</span>
+    </label>
+    <label>
+      Stok
+      <input type="number" name="stock" value="{{ product['stock'] }}" required min="0" step="1">
+    </label>
+  </div>
+
+  <label>
+    Deskripsi
+    <textarea name="description" rows="5" maxlength="2000">{{ product['description'] }}</textarea>
+  </label>
+
+  <label>
+    URL gambar (opsional)
+    <input type="url" name="image_url" value="{{ product['image_url'] }}"
+           maxlength="500" placeholder="https://...">
+  </label>
+
+  <label class="checkbox">
+    <input type="checkbox" name="is_active" value="1" {{ 'checked' if product['is_active'] }}>
+    Tampilkan di katalog
+  </label>
+
+  <div class="row-actions">
+    <button class="btn" type="submit">{{ 'Simpan produk' if mode == 'new' else 'Simpan perubahan' }}</button>
+    <a class="btn btn-ghost" href="{{ url_for('admin.products') }}">Batal</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf %}
+
+{% block title %}Checkout — Tokoku{% endblock %}
+
+{% block content %}
+<h1>Checkout</h1>
+
+<div class="checkout-layout">
+  <section class="panel">
+    <h2>Alamat pengiriman</h2>
+    <form method="post" action="{{ url_for('orders.checkout') }}" class="stack">
+      {{ csrf() }}
+      <label>
+        Nama penerima
+        <input type="text" name="shipping_name" value="{{ values['shipping_name'] }}"
+               required minlength="2" maxlength="80">
+      </label>
+      <label>
+        Nomor telepon / WhatsApp
+        <input type="tel" name="shipping_phone" value="{{ values['shipping_phone'] }}"
+               required minlength="8" maxlength="25" placeholder="0812xxxxxxx">
+      </label>
+      <label>
+        Alamat lengkap
+        <textarea name="shipping_address" rows="4" required minlength="10"
+                  maxlength="400" placeholder="Jalan, nomor, kelurahan, kota, kode pos">{{ values['shipping_address'] }}</textarea>
+      </label>
+      <label>
+        Catatan (opsional)
+        <textarea name="note" rows="2" maxlength="500" placeholder="Contoh: kirim siang hari">{{ values['note'] }}</textarea>
+      </label>
+      <button class="btn" type="submit">Buat pesanan</button>
+    </form>
+  </section>
+
+  <aside class="panel">
+    <h2>Ringkasan</h2>
+    <ul class="summary-list">
+      {% for item in items %}
+        <li>
+          <span>
+            {{ item['name'] }}
+            <span class="muted small">{{ item['qty'] }} × {{ item['price']|rupiah }}</span>
+          </span>
+          <strong>{{ item['subtotal']|rupiah }}</strong>
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="summary-total">
+      <span>Total</span>
+      <strong class="total">{{ total|rupiah }}</strong>
+    </div>
+    <p class="muted small">Stok dikurangi otomatis saat pesanan dibuat.</p>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "_macros.html" import order_status %}
+
+{% block title %}Akun gua — Tokoku{% endblock %}
+
+{% block content %}
+<h1>Akun gua</h1>
+
+<div class="detail-grid">
+  <section class="panel">
+    <h2>Profil</h2>
+    <dl class="kv">
+      <dt>Nama</dt><dd>{{ user['name'] }}</dd>
+      <dt>Email</dt><dd>{{ user['email'] }}</dd>
+      <dt>Peran</dt><dd>{{ 'Admin' if user['role'] == 'admin' else 'Pembeli' }}</dd>
+      <dt>Terdaftar</dt><dd>{{ user['created_at'] }}</dd>
+    </dl>
+    <p class="small"><a href="{{ url_for('auth.change_password') }}">Ubah password</a></p>
+  </section>
+
+  <section class="panel">
+    <h2>Ringkasan</h2>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Total pesanan</span>
+        <strong>{{ summary['total_orders'] }}</strong>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Total belanja</span>
+        <strong>{{ summary['total_spent']|rupiah }}</strong>
+      </div>
+    </div>
+    <p class="muted small">Total belanja tidak menghitung pesanan yang dibatalkan.</p>
+  </section>
+</div>
+
+<section class="panel">
+  <header class="panel-head">
+    <h2>5 pesanan terakhir</h2>
+    <a href="{{ url_for('orders.index') }}">Lihat semua</a>
+  </header>
+
+  {% if recent_orders %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr><th>#</th><th>Tanggal</th><th>Total</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for o in recent_orders %}
+            <tr>
+              <td>#{{ o['id'] }}</td>
+              <td class="muted">{{ o['created_at'] }}</td>
+              <td>{{ o['total']|rupiah }}</td>
+              <td>{{ order_status(o['status'], labels) }}</td>
+              <td><a href="{{ url_for('orders.detail', order_id=o['id']) }}">Detail</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">Belum ada pesanan.</p>
+  {% endif %}
+</section>
+{% endblock %}

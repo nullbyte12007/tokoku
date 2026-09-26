@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Tidak ditemukan — Tokoku{% endblock %}
+
+{% block content %}
+<div class="empty">
+  <h1>404 — Nggak ketemu</h1>
+  <p class="muted">Produk atau halaman yang lu cari nggak ada.</p>
+  <a class="btn" href="{{ url_for('catalog.index') }}">Balik ke katalog</a>
+</div>
+{% endblock %}

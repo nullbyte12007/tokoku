@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_macros.html" import admin_nav, csrf, order_status %}
+
+{% block title %}Admin — Pesanan #{{ order['id'] }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb muted">
+  <a href="{{ url_for('admin.orders') }}">Pesanan</a> / <span>#{{ order['id'] }}</span>
+</nav>
+
+<div class="panel">
+  <header class="panel-head">
+    <div>
+      <h1>Pesanan #{{ order['id'] }}</h1>
+      <p class="muted small">Dibuat {{ order['created_at'] }} · update {{ order['updated_at'] }}</p>
+    </div>
+    {{ order_status(order['status'], labels) }}
+  </header>
+
+  <div class="detail-grid">
+    <div>
+      <h2>Item</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Produk</th><th>Harga</th><th>Qty</th><th>Subtotal</th></tr></thead>
+          <tbody>
+            {% for item in items %}
+              <tr>
+                <td>{{ item['name'] }}</td>
+                <td>{{ item['unit_price']|rupiah }}</td>
+                <td>{{ item['qty'] }}</td>
+                <td><strong>{{ (item['unit_price'] * item['qty'])|rupiah }}</strong></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr><th colspan="3">Total</th><th>{{ order['total']|rupiah }}</th></tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <aside class="stack">
+      <h2>Pembeli</h2>
+      <dl class="kv">
+        <dt>Nama</dt><dd>{{ order['customer_name'] }}</dd>
+        <dt>Email</dt><dd>{{ order['customer_email'] }}</dd>
+        <dt>Penerima</dt><dd>{{ order['shipping_name'] }}</dd>
+        <dt>Telepon</dt><dd>{{ order['shipping_phone'] }}</dd>
+        <dt>Alamat</dt><dd>{{ order['shipping_address'] }}</dd>
+        {% if order['note'] %}<dt>Catatan</dt><dd>{{ order['note'] }}</dd>{% endif %}
+      </dl>
+    </aside>
+  </div>
+
+  {% if transitions %}
+    <form method="post" action="{{ url_for('admin.order_update_status', order_id=order['id']) }}"
+          class="row-actions">
+      {{ csrf() }}
+      <label class="inline-label">
+        Ubah status ke
+        <select name="status">
+          {% for option in transitions %}
+            <option value="{{ option }}">{{ labels.get(option, option) }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button class="btn" type="submit">Simpan status</button>
+    </form>
+  {% else %}
+    <p class="muted">Status pesanan ini sudah final dan tidak bisa diubah lagi.</p>
+  {% endif %}
+</div>
+{% endblock %}

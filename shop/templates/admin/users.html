@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import admin_nav, csrf %}
+
+{% block title %}Admin — Pengguna{% endblock %}
+
+{% block content %}
+<h1>Pengguna</h1>
+{{ admin_nav('users') }}
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Nama</th><th>Email</th><th>Peran</th>
+        <th>Pesanan</th><th>Total belanja</th><th>Ubah peran</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+        <tr>
+          <td class="muted">{{ u['id'] }}</td>
+          <td>
+            <strong>{{ u['name'] }}</strong>
+            {% if u['id'] == current_user['id'] %}<span class="chip">lu</span>{% endif %}
+          </td>
+          <td class="muted">{{ u['email'] }}</td>
+          <td>{{ 'Admin' if u['role'] == 'admin' else 'Pembeli' }}</td>
+          <td>{{ u['total_orders'] }}</td>
+          <td>{{ u['total_spent']|rupiah }}</td>
+          <td>
+            {% if u['id'] == current_user['id'] %}
+              <span class="muted small">akun sendiri</span>
+            {% else %}
+              <form method="post" action="{{ url_for('admin.user_update_role', user_id=u['id']) }}"
+                    class="qty-form">
+                {{ csrf() }}
+                <select name="role">
+                  <option value="customer" {{ 'selected' if u['role'] == 'customer' }}>Pembeli</option>
+                  <option value="admin" {{ 'selected' if u['role'] == 'admin' }}>Admin</option>
+                </select>
+                <button class="btn btn-sm btn-ghost" type="submit">Ubah</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

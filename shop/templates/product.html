@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, product_card %}
+
+{% block title %}{{ product['name'] }} — Tokoku{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb muted">
+  <a href="{{ url_for('catalog.index') }}">Katalog</a> /
+  <a href="{{ url_for('catalog.index', category=product['category']) }}">{{ product['category'] }}</a> /
+  <span>{{ product['name'] }}</span>
+</nav>
+
+<article class="product-detail">
+  <div class="pd-media">
+    <img src="{{ product['image_url'] or url_for('static', filename='placeholder.svg') }}"
+         alt="{{ product['name'] }}">
+  </div>
+
+  <div class="pd-info">
+    <span class="chip">{{ product['category'] }}</span>
+    <h1>{{ product['name'] }}</h1>
+    <p class="pd-price">{{ product['price']|rupiah }}</p>
+
+    {% if product['stock'] > 0 %}
+      <p class="stock">Stok tersedia: {{ product['stock'] }} pcs</p>
+    {% else %}
+      <p class="stock out">Stok habis</p>
+    {% endif %}
+
+    <p class="pd-desc">{{ product['description'] or 'Tanpa deskripsi.' }}</p>
+
+    {% if product['stock'] > 0 %}
+      <form method="post" action="{{ url_for('cart.add') }}" class="add-form">
+        {{ csrf() }}
+        <input type="hidden" name="product_id" value="{{ product['id'] }}">
+        <input type="hidden" name="next" value="{{ url_for('catalog.product_detail', product_id=product['id']) }}">
+        <label>
+          Jumlah
+          <input type="number" name="qty" value="1" min="1"
+                 max="{{ product['stock'] if product['stock'] < 99 else 99 }}">
+        </label>
+        <button class="btn" type="submit">Tambah ke keranjang</button>
+      </form>
+    {% else %}
+      <p class="muted">Produk ini sedang tidak bisa dibeli.</p>
+    {% endif %}
+  </div>
+</article>
+
+{% if related %}
+  <section class="section">
+    <h2>Produk lain di {{ product['category'] }}</h2>
+    <div class="grid-products">
+      {% for p in related %}{{ product_card(p) }}{% endfor %}
+    </div>
+  </section>
+{% endif %}
+{% endblock %}

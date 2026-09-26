@@ -1,0 +1,53 @@
+{% macro csrf() -%}
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+{%- endmacro %}
+
+{% macro product_card(p) %}
+<article class="card product-card">
+  <a class="thumb" href="{{ url_for('catalog.product_detail', product_id=p['id']) }}">
+    <img src="{{ p['image_url'] or url_for('static', filename='placeholder.svg') }}"
+         alt="{{ p['name'] }}" loading="lazy">
+  </a>
+  <div class="card-body">
+    <span class="chip">{{ p['category'] }}</span>
+    <h3><a href="{{ url_for('catalog.product_detail', product_id=p['id']) }}">{{ p['name'] }}</a></h3>
+    <p class="muted clamp">{{ p['description'] or 'Tanpa deskripsi.' }}</p>
+    <div class="card-foot">
+      <strong class="price">{{ p['price']|rupiah }}</strong>
+      {% if p['stock'] > 0 %}
+        <span class="stock">stok {{ p['stock'] }}</span>
+      {% else %}
+        <span class="stock out">habis</span>
+      {% endif %}
+    </div>
+  </div>
+</article>
+{% endmacro %}
+
+{% macro pager(page, pages) %}
+{% if pages > 1 %}
+{% set args = request.args.to_dict() %}
+<nav class="pager" aria-label="Navigasi halaman">
+  {% if page > 1 %}
+    <a href="{{ url_for(request.endpoint, **dict(args, page=page - 1)) }}">&lsaquo; Sebelumnya</a>
+  {% endif %}
+  <span>Halaman {{ page }} / {{ pages }}</span>
+  {% if page < pages %}
+    <a href="{{ url_for(request.endpoint, **dict(args, page=page + 1)) }}">Berikutnya &rsaquo;</a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endmacro %}
+
+{% macro order_status(status, labels) %}
+<span class="status status-{{ status }}">{{ labels.get(status, status) }}</span>
+{% endmacro %}
+
+{% macro admin_nav(active) %}
+<nav class="admin-nav">
+  <a href="{{ url_for('admin.dashboard') }}" class="{{ 'is-active' if active == 'dashboard' }}">Ringkasan</a>
+  <a href="{{ url_for('admin.products') }}" class="{{ 'is-active' if active == 'products' }}">Produk</a>
+  <a href="{{ url_for('admin.orders') }}" class="{{ 'is-active' if active == 'orders' }}">Pesanan</a>
+  <a href="{{ url_for('admin.users') }}" class="{{ 'is-active' if active == 'users' }}">Pengguna</a>
+</nav>
+{% endmacro %}

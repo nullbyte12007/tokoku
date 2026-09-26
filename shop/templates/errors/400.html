@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Permintaan tidak valid — Tokoku{% endblock %}
+
+{% block content %}
+<div class="empty">
+  <h1>400 — Permintaan tidak valid</h1>
+  <p class="muted">{{ message or 'Ada yang salah dengan permintaan ini.' }}</p>
+  <a class="btn" href="{{ url_for('catalog.index') }}">Balik ke katalog</a>
+</div>
+{% endblock %}

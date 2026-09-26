@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, order_status %}
+
+{% block title %}Pesanan #{{ order['id'] }} — Tokoku{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb muted">
+  <a href="{{ url_for('orders.index') }}">Pesanan</a> / <span>#{{ order['id'] }}</span>
+</nav>
+
+<div class="panel">
+  <header class="panel-head">
+    <div>
+      <h1>Pesanan #{{ order['id'] }}</h1>
+      <p class="muted small">Dibuat {{ order['created_at'] }} · update terakhir {{ order['updated_at'] }}</p>
+    </div>
+    {{ order_status(order['status'], labels) }}
+  </header>
+
+  <div class="detail-grid">
+    <div>
+      <h2>Item</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Produk</th><th>Harga</th><th>Qty</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+              <tr>
+                <td>{{ item['name'] }}</td>
+                <td>{{ item['unit_price']|rupiah }}</td>
+                <td>{{ item['qty'] }}</td>
+                <td><strong>{{ (item['unit_price'] * item['qty'])|rupiah }}</strong></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="3">Total</th>
+              <th>{{ order['total']|rupiah }}</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <aside class="stack">
+      <h2>Pengiriman</h2>
+      <p class="muted small">Penerima</p>
+      <p>{{ order['shipping_name'] }}</p>
+      <p class="muted small">Telepon</p>
+      <p>{{ order['shipping_phone'] }}</p>
+      <p class="muted small">Alamat</p>
+      <p>{{ order['shipping_address'] }}</p>
+      {% if order['note'] %}
+        <p class="muted small">Catatan</p>
+        <p>{{ order['note'] }}</p>
+      {% endif %}
+      <p class="muted small">Status pembayaran</p>
+      <p>{{ status_label }}</p>
+    </aside>
+  </div>
+
+  {% if cancellable %}
+    <form method="post" action="{{ url_for('orders.cancel', order_id=order['id']) }}"
+          data-confirm="Batalkan pesanan #{{ order['id'] }}?">
+      {{ csrf() }}
+      <button class="btn btn-ghost danger" type="submit">Batalkan pesanan</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

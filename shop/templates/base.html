@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Tokoku{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="logo" href="{{ url_for('catalog.index') }}">Toko<span>ku</span></a>
+
+      <form class="search" action="{{ url_for('catalog.index') }}" method="get" role="search">
+        <input type="search" name="q" value="{{ q if q is defined else '' }}"
+               placeholder="Cari produk..." aria-label="Cari produk">
+        <button type="submit">Cari</button>
+      </form>
+
+      <nav class="nav" aria-label="Navigasi utama">
+        {% if current_user %}
+          <a href="{{ url_for('cart.view') }}">Keranjang{% if cart_count %} <span class="badge">{{ cart_count }}</span>{% endif %}</a>
+          <a href="{{ url_for('orders.index') }}">Pesanan</a>
+          <a href="{{ url_for('auth.account') }}">{{ current_user['name'].split(' ')[0] }}</a>
+          {% if current_user['role'] == 'admin' %}
+            <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+          {% endif %}
+          <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="linklike">Keluar</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}">Masuk</a>
+          <a class="btn btn-sm" href="{{ url_for('auth.register') }}">Daftar</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="wrap flashes">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}" role="status">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="wrap main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>Tokoku — contoh e-commerce multiuser. Flask + SQLite3, tanpa ORM.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>

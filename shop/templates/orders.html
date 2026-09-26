@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_macros.html" import order_status %}
+
+{% block title %}Pesanan gua — Tokoku{% endblock %}
+
+{% block content %}
+<h1>Pesanan gua</h1>
+
+{% if orders %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tanggal</th>
+          <th>Item</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+          <tr>
+            <td>#{{ o['id'] }}</td>
+            <td class="muted">{{ o['created_at'] }}</td>
+            <td>{{ o['total_qty'] }} pcs</td>
+            <td><strong>{{ o['total']|rupiah }}</strong></td>
+            <td>{{ order_status(o['status'], labels) }}</td>
+            <td><a href="{{ url_for('orders.detail', order_id=o['id']) }}">Detail</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty">
+    <p>Belum ada pesanan.</p>
+    <a class="btn" href="{{ url_for('catalog.index') }}">Belanja dulu</a>
+  </div>
+{% endif %}
+{% endblock %}

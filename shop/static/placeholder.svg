@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" role="img" aria-label="Gambar produk belum tersedia">
+  <rect width="400" height="300" fill="#eef0f6"/>
+  <path d="M120 190l45-55 38 44 30-34 47 45z" fill="#c7ccdd"/>
+  <circle cx="145" cy="115" r="18" fill="#c7ccdd"/>
+  <text x="200" y="245" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#8b92a8">belum ada gambar</text>
+</svg>

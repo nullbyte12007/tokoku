@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf %}
+
+{% block title %}Masuk — Tokoku{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1>Masuk</h1>
+  <p class="muted">Belum punya akun? <a href="{{ url_for('auth.register') }}">Daftar di sini</a>.</p>
+
+  <form method="post" class="stack">
+    {{ csrf() }}
+    {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+    <label>
+      Email
+      <input type="email" name="email" value="{{ email }}" required autocomplete="email" autofocus>
+    </label>
+    <label>
+      Password
+      <input type="password" name="password" required autocomplete="current-password">
+    </label>
+    <p class="muted small"><a href="{{ url_for('auth.forgot_password') }}">Lupa password?</a></p>
+    <button class="btn" type="submit">Masuk</button>
+  </form>
+</div>
+{% endblock %}

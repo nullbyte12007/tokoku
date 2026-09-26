@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "_macros.html" import admin_nav, csrf, order_status %}
+
+{% block title %}Admin — Pesanan{% endblock %}
+
+{% block content %}
+<h1>Pesanan</h1>
+{{ admin_nav('orders') }}
+
+<div class="filter-row">
+  <a class="chip {{ 'is-active' if not status }}" href="{{ url_for('admin.orders') }}">Semua</a>
+  {% for key, text in labels.items() %}
+    <a class="chip {{ 'is-active' if status == key }}"
+       href="{{ url_for('admin.orders', status=key) }}">{{ text }}</a>
+  {% endfor %}
+</div>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th><th>Pembeli</th><th>Tanggal</th><th>Item</th><th>Total</th>
+        <th>Status</th><th>Ubah status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+        <tr>
+          <td class="muted">{{ o['id'] }}</td>
+          <td>
+            {{ o['customer_name'] }}
+            <div class="muted small">{{ o['customer_email'] }}</div>
+          </td>
+          <td class="muted">{{ o['created_at'] }}</td>
+          <td>{{ o['total_qty'] }} pcs</td>
+          <td><strong>{{ o['total']|rupiah }}</strong></td>
+          <td>{{ order_status(o['status'], labels) }}</td>
+          <td>
+            {% set options = transitions.get(o['status'], ()) %}
+            {% if options %}
+              <form method="post" action="{{ url_for('admin.order_update_status', order_id=o['id']) }}"
+                    class="qty-form">
+                {{ csrf() }}
+                <input type="hidden" name="next" value="{{ url_for('admin.orders', status=status or None) }}">
+                <select name="status">
+                  {% for option in options %}
+                    <option value="{{ option }}">{{ labels.get(option, option) }}</option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn-sm btn-ghost" type="submit">Ubah</button>
+              </form>
+            {% else %}
+              <span class="muted small">final</span>
+            {% endif %}
+          </td>
+          <td><a href="{{ url_for('admin.order_detail', order_id=o['id']) }}">Detail</a></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="muted">Tidak ada pesanan pada filter ini.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
