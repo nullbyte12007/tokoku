@@ -1,5 +1,12 @@
 # Tokoku — E-commerce Multiuser
 
+[![CI](https://github.com/nullbyte12007/tokoku/actions/workflows/ci.yml/badge.svg)](https://github.com/nullbyte12007/tokoku/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/flask-%E2%89%A53.0-000000?logo=flask&logoColor=white)
+![SQLite](https://img.shields.io/badge/sqlite-3-003B57?logo=sqlite&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-38-2ea44f)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 Aplikasi toko online sederhana dengan **Flask + SQLite**, dibangun tanpa ORM
 (SQL langsung dengan *prepared statement*). Mencakup katalog, keranjang, checkout,
 riwayat pesanan, panel admin, dan manajemen akun.
@@ -108,6 +115,22 @@ Konfigurasi opsional lewat environment variable:
 > Hapus atau ganti sebelum dipakai di lingkungan nyata.
 
 ---
+
+## Pengujian
+
+38 pengujian end-to-end memakai *test client* Flask (stdlib `unittest`, tanpa database asli):
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Cakupan: autentikasi & sesi, kontrol akses (IDOR, rute admin), CSRF, captcha
+(kosong/salah/kedaluwarsa/honeypot), throttle login & registrasi, alur reset password
+(token sekali pakai & kedaluwarsa), validasi input, alur keranjang sampai checkout,
+penanganan stok, serta perubahan status pesanan.
+
+Pipeline **GitHub Actions** menjalankan syntax check + seluruh test pada setiap push
+dan pull request (Python 3.12 & 3.13).
 
 ## Catatan desain
 
