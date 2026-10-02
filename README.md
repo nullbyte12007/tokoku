@@ -1,6 +1,6 @@
 # Tokoku — E-commerce Multiuser
 
-[![CI](https://github.com/nullbyte12007/tokoku/actions/workflows/ci.yml/badge.svg)](https://github.com/nullbyte12007/tokoku/actions/workflows/ci.yml)
+[![CI](https://github.com/myusufcs/tokoku/actions/workflows/ci.yml/badge.svg)](https://github.com/myusufcs/tokoku/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13-3776AB?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/flask-%E2%89%A53.0-000000?logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/sqlite-3-003B57?logo=sqlite&logoColor=white)
